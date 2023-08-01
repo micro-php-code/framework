@@ -1,8 +1,8 @@
 {
-    "name": "simple-php/framework",
+    "name": "microphp/framework",
     "autoload": {
         "psr-4": {
-            "Simple\\Framework\\": "src/"
+            "MicroPHP\\Framework\\": "src/"
         },
         "files": [
             "src/functons.php"

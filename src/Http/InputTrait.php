@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Simple\Framework\Http;
+namespace MicroPHP\Framework\Http;
 
 trait InputTrait
 {

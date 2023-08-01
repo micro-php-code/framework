@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Simple\Framework\Traits;
+namespace MicroPHP\Framework\Traits;
 
 /**
  * @method static static updateOrCreate(array $attributes, array $values = [])

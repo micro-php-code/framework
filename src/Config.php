@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Simple\Framework;
+namespace MicroPHP\Framework;
 
 class Config
 {

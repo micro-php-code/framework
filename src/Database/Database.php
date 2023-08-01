@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Simple\Framework\Database;
+namespace MicroPHP\Framework\Database;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 

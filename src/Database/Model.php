@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Simple\Framework\Database;
+namespace MicroPHP\Framework\Database;
 
-use Simple\Framework\Traits\ModelIdeHelper;
+use MicroPHP\Framework\Traits\ModelIdeHelper;
 
 class Model extends \Illuminate\Database\Eloquent\Model
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Simple\Framework;
+namespace MicroPHP\Framework;
 
 use JsonSerializable;
-use Simple\Framework\Http\Response;
+use MicroPHP\Framework\Http\Response;
 
 class Controller
 {

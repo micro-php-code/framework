@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Simple\Framework\Http;
+namespace MicroPHP\Framework\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;

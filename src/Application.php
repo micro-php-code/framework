@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Simple\Framework;
+namespace MicroPHP\Framework;
 use JsonException;
 use League\Container\Container;
 use League\Container\DefinitionContainerInterface;
@@ -12,9 +12,9 @@ use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
-use Simple\Framework\Database\Database;
-use Simple\Framework\Http\Response;
-use Simple\Framework\Http\ServerRequest;
+use MicroPHP\Framework\Database\Database;
+use MicroPHP\Framework\Http\Response;
+use MicroPHP\Framework\Http\ServerRequest;
 use Spiral\RoadRunner\Http\PSR7Worker;
 use Spiral\RoadRunner\Worker;
 use Throwable;
