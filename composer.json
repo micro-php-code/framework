@@ -1,5 +1,5 @@
 {
-    "name": "simple/framework",
+    "name": "simple-php/framework",
     "autoload": {
         "psr-4": {
             "Simple\\Framework\\": "src/"
