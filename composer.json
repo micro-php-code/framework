@@ -20,6 +20,7 @@
         "nyholm/psr7": "^1.8",
         "league/container": ">=4.0",
         "league/route": ">=5.0",
-        "illuminate/database": "*"
+        "illuminate/database": "*",
+        "symfony/console": ">=v6.3.2"
     }
 }
