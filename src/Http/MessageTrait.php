@@ -12,6 +12,7 @@ trait MessageTrait
     {
         $new = clone $this;
         $new->bind = $this->bind->withProtocolVersion($version);
+
         return $new;
     }
 
@@ -39,6 +40,7 @@ trait MessageTrait
     {
         $new = clone $this;
         $new->bind = $this->bind->withHeader($name, $value);
+
         return $new;
     }
 
@@ -46,6 +48,7 @@ trait MessageTrait
     {
         $new = clone $this;
         $new->bind = $this->bind->withAddedHeader($name, $value);
+
         return $new;
     }
 
@@ -53,6 +56,7 @@ trait MessageTrait
     {
         $new = clone $this;
         $new->bind = $this->bind->withoutHeader($name);
+
         return $new;
     }
 
@@ -65,6 +69,7 @@ trait MessageTrait
     {
         $new = clone $this;
         $new->bind = $this->bind->withBody($body);
+
         return $new;
     }
 }

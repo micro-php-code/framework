@@ -19,6 +19,7 @@ class Config
                 return $default;
             }
         }
+
         return $config;
     }
 
@@ -29,6 +30,7 @@ class Config
             $key = basename($file, '.php');
             static::$config[$key] = require $file;
         }
+
         return static::$config;
     }
 }

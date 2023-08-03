@@ -18,7 +18,6 @@ class AttributeScanner
         $this->map = new AttributeScannerMap();
     }
 
-
     /**
      * @throws ReflectionException
      */
@@ -34,6 +33,7 @@ class AttributeScanner
                 $this->getAttributes($reflectionClass);
             }
         }
+
         return $this->map;
     }
 
@@ -51,13 +51,13 @@ class AttributeScanner
         for ($i = 0; $i < count($tokens); $i++) {
 
             // 读取命名空间
-            if ($tokens[$i][0] === T_NAMESPACE) {
+            if (T_NAMESPACE === $tokens[$i][0]) {
                 $namespace = $this->getNamespace($tokens, $i);
             }
 
             // 读取类名
-            if ($tokens[$i][0] === T_CLASS) {
-                return $this->getReflectionClass($tokens[$i+2][1], $namespace);
+            if (T_CLASS === $tokens[$i][0]) {
+                return $this->getReflectionClass($tokens[$i + 2][1], $namespace);
             }
         }
 
@@ -66,34 +66,29 @@ class AttributeScanner
 
     /**
      * 获取命名空间
-     *
-     * @param array $tokens
-     * @param int $namespaceIndex
-     * @return string
      */
     private function getNamespace(array $tokens, int $namespaceIndex): string
     {
         $namespace = '';
         for ($i = $namespaceIndex + 1; $i < count($tokens); $i++) {
-            if ($tokens[$i] === ';') {
+            if (';' === $tokens[$i]) {
                 break;
             }
             $namespace .= $tokens[$i][1];
         }
+
         return trim($namespace);
     }
 
     /**
      * 创建反射类对象
      *
-     * @param  string  $className
-     * @param  string  $namespace
-     * @return ReflectionClass
      * @throws ReflectionException
      */
     private function getReflectionClass(string $className, string $namespace): ReflectionClass
     {
         $fullName = trim($namespace, '\\') . '\\' . $className;
+
         return new ReflectionClass($fullName);
     }
 

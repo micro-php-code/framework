@@ -9,7 +9,8 @@ use Psr\Http\Message\UriInterface;
 
 class ServerRequest implements ServerRequestInterface
 {
-    use MessageTrait, InputTrait;
+    use MessageTrait;
+    use InputTrait;
 
     private ServerRequestInterface $bind;
 
@@ -37,6 +38,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->bind = $this->bind->withCookieParams($cookies);
+
         return $new;
     }
 
@@ -49,6 +51,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->bind = $this->bind->withQueryParams($query);
+
         return $new;
     }
 
@@ -61,6 +64,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->bind = $this->bind->withUploadedFiles($uploadedFiles);
+
         return $new;
     }
 
@@ -73,6 +77,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->bind = $this->bind->withParsedBody($data);
+
         return $new;
     }
 
@@ -90,6 +95,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->bind = $this->bind->withAttribute($name, $value);
+
         return $new;
     }
 
@@ -97,6 +103,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->bind = $this->bind->withoutAttribute($name);
+
         return $new;
     }
 
@@ -109,6 +116,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->bind = $this->bind->withRequestTarget($requestTarget);
+
         return $new;
     }
 
@@ -121,6 +129,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->bind = $this->bind->withMethod($method);
+
         return $new;
     }
 
@@ -133,6 +142,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->bind = $this->bind->withUri($uri, $preserveHost);
+
         return $new;
     }
 

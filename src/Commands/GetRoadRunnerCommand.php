@@ -25,11 +25,10 @@ class GetRoadRunnerCommand extends Command
         // 创建一个问题对象
         $question = new Question('Add .rr.yaml config file ? (y/n) ', 'y');
 
-
         // 提示用户回答问题
         $answer = $helper->ask($input, $output, $question);
 
-        if ($answer == 'y') {
+        if ('y' == $answer) {
             copy(__DIR__ . '/../.rr.yaml', BASE_PATH . '/.rr.yaml');
         }
 

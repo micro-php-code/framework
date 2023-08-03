@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace MicroPHP\Framework;
+
 use JsonException;
 use League\Container\Container;
 use League\Container\DefinitionContainerInterface;
@@ -12,12 +13,12 @@ use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
 use MicroPHP\Framework\Attribute\Scanner\AttributeScanner;
 use MicroPHP\Framework\Attribute\Scanner\AttributeScannerMap;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use MicroPHP\Framework\Database\Database;
 use MicroPHP\Framework\Http\Response;
 use MicroPHP\Framework\Http\ServerRequest;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Spiral\RoadRunner\Http\PSR7Worker;
@@ -26,10 +27,11 @@ use Throwable;
 
 final class Application
 {
-
     private static DefinitionContainerInterface $container;
 
-    private function __construct(){}
+    private function __construct()
+    {
+    }
 
     /**
      * @throws Throwable
@@ -44,10 +46,30 @@ final class Application
      * @throws ReflectionException
      * @throws JsonException
      */
-    public static function run(): void {
+    public static function run(): void
+    {
         $app = new Application();
-        $config =$app->init();
+        $config = $app->init();
         $app->listen($config);
+    }
+
+    public static function getContainer(): ContainerInterface
+    {
+        return Application::$container;
+    }
+
+    /**
+     * @template T
+     *
+     * @param  class-string<T> $class
+     * @return T
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function getClass(string $class)
+    {
+        return Application::getContainer()->get($class);
     }
 
     /**
@@ -59,11 +81,13 @@ final class Application
         $config = $this->getConfig();
         $this->initDatabase($config['database']);
         $this->scanAttributes($config['app']['scanner']);
+
         return $config;
     }
 
     /**
      * @throws JsonException
+     *
      * @noinspection PhpRedundantCatchClauseInspection
      */
     private function listen(array $config): void
@@ -80,17 +104,15 @@ final class Application
             $request = ServerRequest::fromPsr7($req);
             try {
                 $psr7->respond($router->dispatch($request));
-            } catch (NotFoundException $exception){
+            } catch (NotFoundException $exception) {
                 $psr7->respond(new Response(404, [], $exception->getMessage()));
             } catch (MethodNotAllowedException $exception) {
                 $psr7->respond(new Response(405, [], $exception->getMessage()));
             } catch (Throwable $e) {
-                $psr7->getWorker()->error((string)$e);
+                $psr7->getWorker()->error((string) $e);
             }
         }
     }
-
-
 
     private function initDatabase(array $config): void
     {
@@ -104,9 +126,10 @@ final class Application
 
     private function getRouter(Router $router): Router
     {
-        $strategy = new ApplicationStrategy;
+        $strategy = new ApplicationStrategy();
         $strategy->setContainer(Application::getContainer());
         $router->setStrategy($strategy);
+
         return $router;
     }
 
@@ -123,22 +146,5 @@ final class Application
     {
         Application::$container = new Container();
         Application::$container->defaultToShared();
-    }
-
-    public static function getContainer(): ContainerInterface
-    {
-        return Application::$container;
-    }
-
-    /**
-     * @template T
-     * @param  class-string<T>  $class
-     * @return T
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public static function getClass(string $class)
-    {
-        return Application::getContainer()->get($class);
     }
 }

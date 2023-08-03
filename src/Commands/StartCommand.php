@@ -18,15 +18,16 @@ class StartCommand extends Command
         $process = new Process(['./rr', 'serve'], timeout: null);
         $process->mustRun(function ($type, $buffer) use ($output) {
             if (str_contains($buffer, 'ERROR')) {
-                $output->writeln('<error>'.$buffer.'</error>');
+                $output->writeln('<error>' . $buffer . '</error>');
             } elseif (str_contains($buffer, 'WARN')) {
-                $output->writeln('<comment>'.$buffer.'</comment>');
+                $output->writeln('<comment>' . $buffer . '</comment>');
             } elseif (preg_match('/INFO\s+server/', $buffer)) {
-                $output->writeln('<fg=cyan>'.$buffer . '</>');
+                $output->writeln('<fg=cyan>' . $buffer . '</>');
             } else {
-                $output->writeln('<info>'.$buffer.'</info>');
+                $output->writeln('<info>' . $buffer . '</info>');
             }
         });
+
         return Command::SUCCESS;
     }
 

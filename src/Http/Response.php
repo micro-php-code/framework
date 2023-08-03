@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MicroPHP\Framework\Http;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
 
 class Response implements ResponseInterface
 {
     use MessageTrait;
+
     private ResponseInterface $bind;
 
     public function __construct(int $status = 200, array $headers = [], $body = null, string $version = '1.1', string $reason = null)
