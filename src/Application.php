@@ -46,14 +46,15 @@ final class Application
      * @throws ReflectionException
      * @throws JsonException
      */
-    public static function run(): void
+    public static function run(): Application
     {
         $app = new Application();
         $config = $app->init();
         $app->listen($config);
+        return $app;
     }
 
-    public static function getContainer(): ContainerInterface
+    public static function getContainer(): Container
     {
         return Application::$container;
     }
@@ -93,6 +94,7 @@ final class Application
     private function listen(array $config): void
     {
         $router = $this->getRouter($config['routes']);
+        Application::getContainer()->add(Router::class, $router);
 
         $worker = Worker::create();
 
