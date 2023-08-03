@@ -8,6 +8,11 @@
             "src/functons.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "MicroPHP\\Framework\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "liutao",
@@ -26,6 +31,7 @@
         "respect/validation": ">=2.2",
         "spiral/roadrunner-cli": "*",
         "symfony/finder": ">=6",
-        "guzzlehttp/guzzle": ">=7.7"
+        "guzzlehttp/guzzle": ">=7.7",
+        "symfony/dotenv": "^6.0"
     }
 }

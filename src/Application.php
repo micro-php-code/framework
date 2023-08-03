@@ -35,17 +35,19 @@ final class Application
     /**
      * @throws Throwable
      */
-    public static function boot(): void
+    public static function boot(): Application
     {
         $app = new Application();
         $app->init();
+
+        return $app;
     }
 
     /**
      * @throws ReflectionException
      * @throws JsonException
      */
-    public static function run(): Application
+    public function run(): Application
     {
         $app = new Application();
         $config = $app->init();
@@ -78,6 +80,7 @@ final class Application
      */
     private function init(): array
     {
+        Env::load();
         $this->initContainer();
         $config = $this->getConfig();
         $this->initDatabase($config['database']);

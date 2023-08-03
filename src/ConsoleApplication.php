@@ -17,14 +17,13 @@ class ConsoleApplication
      * @throws Throwable
      * @throws NotFoundExceptionInterface
      */
-    public static function boot(): void
+    public static function boot(Application $app): void
     {
-        Application::boot();
         $configCommands = Config::get('commands');
         $application = new \Symfony\Component\Console\Application();
         $application->addCommands(array_map(static function (string $command) {
             return new $command();
-        }, array_unique(array_merge($configCommands, AttributeScannerMap::get()->getClassesNames(CMD::class)))));
+        }, array_unique(array_merge($configCommands, $app->getClass(AttributeScannerMap::class)::get()->getClassesNames(CMD::class)))));
 
         $application->run();
     }

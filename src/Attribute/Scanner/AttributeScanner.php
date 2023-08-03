@@ -23,6 +23,9 @@ class AttributeScanner
      */
     public function scan(array $directories): AttributeScannerMap
     {
+        $directories = array_map(function ($directory) {
+            return realpath($directory);
+        }, $directories);
         $finder = new Finder();
         $finder->in($directories)
             ->files()
