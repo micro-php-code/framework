@@ -21,6 +21,9 @@
         "league/container": ">=4.0",
         "league/route": ">=5.0",
         "illuminate/database": "*",
-        "symfony/console": ">=v6.3.2"
+        "symfony/console": ">=6",
+        "symfony/process": ">=6",
+        "respect/validation": ">=2.2",
+        "symfony/finder": ">=6"
     }
 }

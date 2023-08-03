@@ -10,37 +10,66 @@ use League\Route\Http\Exception\MethodNotAllowedException;
 use League\Route\Http\Exception\NotFoundException;
 use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
+use MicroPHP\Framework\Attribute\Scanner\AttributeScanner;
+use MicroPHP\Framework\Attribute\Scanner\AttributeScannerMap;
 use Nyholm\Psr7\Factory\Psr17Factory;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use MicroPHP\Framework\Database\Database;
 use MicroPHP\Framework\Http\Response;
 use MicroPHP\Framework\Http\ServerRequest;
+use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 use Spiral\RoadRunner\Http\PSR7Worker;
 use Spiral\RoadRunner\Worker;
 use Throwable;
 
-class Application
+final class Application
 {
+
     private static DefinitionContainerInterface $container;
+
+    private function __construct(){}
+
     /**
      * @throws Throwable
-     * @throws JsonException
      */
     public static function boot(): void
     {
-        static::initContainer();
-        (new static())->init();
+        $app = new Application();
+        $app->init();
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws JsonException
+     */
+    public static function run(): void {
+        $app = new Application();
+        $config =$app->init();
+        $app->listen($config);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function init(): array
+    {
+        $this->initContainer();
+        $config = $this->getConfig();
+        $this->initDatabase($config['database']);
+        $this->scanAttributes($config['app']['scanner']);
+        return $config;
     }
 
     /**
      * @throws JsonException
      * @noinspection PhpRedundantCatchClauseInspection
      */
-    private function init(): void
+    private function listen(array $config): void
     {
-        $config = $this->getConfig();
         $router = $this->getRouter($config['routes']);
-        $this->initDatabase($config['database']);
+
         $worker = Worker::create();
 
         $factory = new Psr17Factory();
@@ -61,6 +90,8 @@ class Application
         }
     }
 
+
+
     private function initDatabase(array $config): void
     {
         Database::boot($config);
@@ -74,19 +105,40 @@ class Application
     private function getRouter(Router $router): Router
     {
         $strategy = new ApplicationStrategy;
-        $strategy->setContainer(static::getContainer());
+        $strategy->setContainer(Application::getContainer());
         $router->setStrategy($strategy);
         return $router;
     }
 
-    private static function initContainer(): void
+    /**
+     * @throws ReflectionException
+     */
+    private function scanAttributes(array $config): void
     {
-        static::$container = new Container();
-        static::$container->defaultToShared();
+        $result = (new AttributeScanner())->scan($config['directories']);
+        Application::$container->add(AttributeScannerMap::class, $result);
     }
 
-    public function getContainer(): ContainerInterface
+    private function initContainer(): void
     {
-        return static::$container;
+        Application::$container = new Container();
+        Application::$container->defaultToShared();
+    }
+
+    public static function getContainer(): ContainerInterface
+    {
+        return Application::$container;
+    }
+
+    /**
+     * @template T
+     * @param  class-string<T>  $class
+     * @return T
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function getClass(string $class)
+    {
+        return Application::getContainer()->get($class);
     }
 }
