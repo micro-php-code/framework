@@ -19,6 +19,7 @@ class HttpTestResponse
     public function assertStatus(int $status): self
     {
         Assert::assertSame($status, $this->response->getStatusCode());
+
         return $this;
     }
 
@@ -29,8 +30,8 @@ class HttpTestResponse
 
     /**
      * 判断 JSON 响应数据中是否存在指定的键，支持通配符*
-     * @param  string  $key  要判断的键名数组
      *
+     * @param string $key 要判断的键名数组
      */
     public function assertJsonHasKey(string $key): self
     {
@@ -38,7 +39,7 @@ class HttpTestResponse
         $json = $this->decodeResponseJson();
         $result = data_get($json, $key, $default);
         if (str_contains($key, '*')) {
-            if (count(array_filter($result, fn ($item) => ! is_null($item))) === 0) {
+            if (0 === count(array_filter($result, fn ($item) => ! is_null($item)))) {
                 Assert::fail('array key:' . $key . ' not found');
             }
         } else {
@@ -48,13 +49,7 @@ class HttpTestResponse
         return $this;
     }
 
-    private function decodeResponseJson()
-    {
-        $testJson = $this->response->getBody()->getContents();
-        return json_decode($testJson, true);
-    }
-
-    public function json(?string $key = null)
+    public function json(string $key = null)
     {
         return is_null($key) ? $this->decodeResponseJson() : $this->decodeResponseJson()[$key];
     }
@@ -62,5 +57,12 @@ class HttpTestResponse
     public function getContent(): string
     {
         return $this->response->getBody()->getContents();
+    }
+
+    private function decodeResponseJson()
+    {
+        $testJson = $this->response->getBody()->getContents();
+
+        return json_decode($testJson, true);
     }
 }

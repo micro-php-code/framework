@@ -18,7 +18,6 @@ use MicroPHP\Framework\Http\Response;
 use MicroPHP\Framework\Http\ServerRequest;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Spiral\RoadRunner\Http\PSR7Worker;
@@ -51,6 +50,7 @@ final class Application
         $app = new Application();
         $config = $app->init();
         $app->listen($config);
+
         return $app;
     }
 

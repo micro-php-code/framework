@@ -23,7 +23,7 @@ class Http
      */
     public function post(string $url, array $requestParams = [], array $json = [], array $headers = [], array $formParams = []): ResponseInterface
     {
-        return $this->request('POST', $url,$requestParams, $json, $headers, $formParams);
+        return $this->request('POST', $url, $requestParams, $json, $headers, $formParams);
     }
 
     /**
@@ -35,6 +35,7 @@ class Http
         if ($requestParams) {
             $url = $url . '?' . http_build_query($requestParams);
         }
+
         return $client->request($method, $url, [
             'headers' => $headers,
             'form_params' => $formParams,

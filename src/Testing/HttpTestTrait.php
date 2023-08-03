@@ -17,6 +17,7 @@ trait HttpTestTrait
     {
         return $this->request('POST', $uri, $data, $headers, $requestParams);
     }
+
     protected function request(string $method, string $uri, array $data = [], array $headers = [], array $requestParams = []): HttpTestResponse
     {
         return new HttpTestResponse((new Http())->request($method, $uri, requestParams: $requestParams, json: $data, headers: $headers));
