@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MicroPHP\Framework\Http\Contract;
 
-use League\Route\Router;
+use MicroPHP\Framework\Router\Router;
 
-interface ServerInterface
+interface HttpServerInterface
 {
     public function run(Router $router): void;
 }

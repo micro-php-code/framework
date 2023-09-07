@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MicroPHP\Framework\Http;
 
+use MicroPHP\Framework\Http\Traits\MessageTrait;
 use Psr\Http\Message\ResponseInterface;
 
 class Response implements ResponseInterface

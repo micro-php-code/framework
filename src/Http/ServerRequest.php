@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MicroPHP\Framework\Http;
 
+use MicroPHP\Framework\Http\Traits\InputTrait;
+use MicroPHP\Framework\Http\Traits\MessageTrait;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
