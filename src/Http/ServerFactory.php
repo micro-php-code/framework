@@ -15,12 +15,11 @@ class ServerFactory
 {
     public static function newServer(): HttpServerInterface
     {
-        $serverConfig = Config::get('app.server');
-
-        return match ($serverConfig['driver']) {
+        $serverConfig = new ServerConfig();
+        return match ($serverConfig->getDriver()) {
             Driver::WORKERMAN => new WorkermanHttpServer(),
             Driver::ROADRUNNER => new RoadRunnerHttpServer(),
-            default => throw new RuntimeException('unsupported driver: ' . $serverConfig['driver']),
+            default => throw new RuntimeException('unsupported driver: ' . $serverConfig->getDriver()),
         };
     }
 }
