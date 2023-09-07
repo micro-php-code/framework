@@ -6,6 +6,7 @@ namespace MicroPHP\Framework;
 
 use MicroPHP\Framework\Attribute\Attributes\CMD;
 use MicroPHP\Framework\Attribute\Scanner\AttributeScannerMap;
+use MicroPHP\Framework\Config\Config;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Throwable;

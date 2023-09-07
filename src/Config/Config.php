@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MicroPHP\Framework;
+namespace MicroPHP\Framework\Config;
+
+use ReflectionException;
 
 class Config
 {
@@ -23,12 +25,20 @@ class Config
         return $config;
     }
 
+    /**
+     * @param mixed $directory
+     *
+     * @throws ReflectionException
+     */
     public static function load($directory): array
     {
+        static::$config = (new ConfigProviderScanner())->scan();
+
         $files = glob($directory . '/*.php');
         foreach ($files as $file) {
             $key = basename($file, '.php');
-            static::$config[$key] = require $file;
+            $config = require $file;
+            static::$config[$key] = is_array($config) ? array_merge(static::$config[$key] ?? [], $config) : $config;
         }
 
         return static::$config;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MicroPHP\Framework\Http;
 
-use MicroPHP\Framework\Config;
+use MicroPHP\Framework\Config\Config;
 
 class ServerConfig
 {

@@ -8,6 +8,7 @@ use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
 use MicroPHP\Framework\Attribute\Scanner\AttributeScanner;
 use MicroPHP\Framework\Attribute\Scanner\AttributeScannerMap;
+use MicroPHP\Framework\Config\Config;
 use MicroPHP\Framework\Container\ContainerInterface;
 use MicroPHP\Framework\Database\Database;
 use MicroPHP\Framework\Http\ServerFactory;
@@ -93,6 +94,9 @@ final class Application
         Database::boot($config);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     private function getConfig(): array
     {
         return Config::load(BASE_PATH . '/config');
