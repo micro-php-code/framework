@@ -27,7 +27,7 @@ class ConfigProviderScanner
             $reflectionClass = $this->getReflectClassFromFile($file);
             $instance = $reflectionClass->newInstance();
             if ($instance instanceof ConfigProviderInterface) {
-                $configs = array_merge($configs, $instance->config());
+                $configs = array_merge_recursive($configs, $instance->config());
             }
         }
 
