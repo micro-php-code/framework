@@ -37,6 +37,6 @@ class Env
 
     public static function load(): void
     {
-        (new Dotenv())->loadEnv(base_path('.env'));
+        (new Dotenv())->usePutenv()->loadEnv(base_path('.env'));
     }
 }

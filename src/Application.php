@@ -4,29 +4,21 @@ declare(strict_types=1);
 
 namespace MicroPHP\Framework;
 
-use JsonException;
-use League\Container\Container;
-use League\Container\DefinitionContainerInterface;
-use League\Route\Http\Exception\MethodNotAllowedException;
-use League\Route\Http\Exception\NotFoundException;
 use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
 use MicroPHP\Framework\Attribute\Scanner\AttributeScanner;
 use MicroPHP\Framework\Attribute\Scanner\AttributeScannerMap;
+use MicroPHP\Framework\Container\ContainerInterface;
 use MicroPHP\Framework\Database\Database;
-use MicroPHP\Framework\Http\Response;
-use MicroPHP\Framework\Http\ServerRequest;
-use Nyholm\Psr7\Factory\Psr17Factory;
+use MicroPHP\Framework\Http\ServerFactory;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
-use Spiral\RoadRunner\Http\PSR7Worker;
-use Spiral\RoadRunner\Worker;
 use Throwable;
 
 final class Application
 {
-    private static DefinitionContainerInterface $container;
+    private static ContainerInterface $container;
 
     private function __construct()
     {
@@ -39,13 +31,13 @@ final class Application
     {
         $app = new Application();
         $app->init();
+        self::getContainer()->add(Application::class, $app);
 
         return $app;
     }
 
     /**
      * @throws ReflectionException
-     * @throws JsonException
      */
     public function run(): Application
     {
@@ -56,7 +48,7 @@ final class Application
         return $app;
     }
 
-    public static function getContainer(): Container
+    public static function getContainer(): ContainerInterface
     {
         return Application::$container;
     }
@@ -89,34 +81,11 @@ final class Application
         return $config;
     }
 
-    /**
-     * @throws JsonException
-     *
-     * @noinspection PhpRedundantCatchClauseInspection
-     */
     private function listen(array $config): void
     {
         $router = $this->getRouter($config['routes']);
         Application::getContainer()->add(Router::class, $router);
-
-        $worker = Worker::create();
-
-        $factory = new Psr17Factory();
-
-        $psr7 = new PSR7Worker($worker, $factory, $factory, $factory);
-
-        while ($req = $psr7->waitRequest()) {
-            $request = ServerRequest::fromPsr7($req);
-            try {
-                $psr7->respond($router->dispatch($request));
-            } catch (NotFoundException $exception) {
-                $psr7->respond(new Response(404, [], $exception->getMessage()));
-            } catch (MethodNotAllowedException $exception) {
-                $psr7->respond(new Response(405, [], $exception->getMessage()));
-            } catch (Throwable $e) {
-                $psr7->getWorker()->error((string) $e);
-            }
-        }
+        ServerFactory::newServer()->run($router);
     }
 
     private function initDatabase(array $config): void
@@ -149,7 +118,7 @@ final class Application
 
     private function initContainer(): void
     {
-        Application::$container = new Container();
+        Application::$container = new \MicroPHP\Framework\Container\Container();
         Application::$container->defaultToShared();
     }
 }
