@@ -38,10 +38,37 @@ class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequ
         $body = $httpFactory->createStream((string) $swooleRequest->rawContent());
         $protocol = isset($server['server_protocol']) ? str_replace('HTTP/', '', $server['server_protocol']) : '1.1';
         $request = new ServerRequest($method, $uri, $headers, $body, $protocol, $server);
+
         return $request->withCookieParams($swooleRequest->cookie ?? [])
             ->withQueryParams($swooleRequest->get ?? [])
             ->withParsedBody(self::normalizeParsedBody($swooleRequest->post ?? [], $request))
             ->withUploadedFiles(self::normalizeFiles($swooleRequest->files ?? []));
+    }
+
+    protected static function normalizeParsedBody(array $data = [], RequestInterface $request = null): array
+    {
+        if (! $request) {
+            return $data;
+        }
+
+        $rawContentType = $request->getHeaderLine('content-type');
+        if (($pos = strpos($rawContentType, ';')) !== false) {
+            $contentType = strtolower(substr($rawContentType, 0, $pos));
+        } else {
+            $contentType = strtolower($rawContentType);
+        }
+        switch ($contentType) {
+            case 'application/json':
+            case 'text/json':
+                $data = json_decode((string) $request->getBody(), true);
+                break;
+            case 'application/xml':
+            case 'text/xml':
+                $data = (array) simplexml_load_string((string) $request->getBody());
+                break;
+        }
+
+        return $data;
     }
 
     private static function getUriFromSwooleRequest(Request $swooleRequest): UriInterface
@@ -49,7 +76,7 @@ class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequ
         $server = $swooleRequest->server;
         $header = $swooleRequest->header;
         $uri = new Uri();
-        $uri = $uri->withScheme(! empty($server['https']) && $server['https'] !== 'off' ? 'https' : 'http');
+        $uri = $uri->withScheme(! empty($server['https']) && 'off' !== $server['https'] ? 'https' : 'http');
 
         $hasPort = false;
         if (isset($server['http_host'])) {
@@ -109,32 +136,6 @@ class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequ
 
     private static function getUriDefaultPort(UriInterface $uri): ?int
     {
-        return $uri->getScheme() === 'https' ? 443 : ($uri->getScheme() === 'http' ? 80 : null);
-    }
-
-    protected static function normalizeParsedBody(array $data = [], ?RequestInterface $request = null): array
-    {
-        if (! $request) {
-            return $data;
-        }
-
-        $rawContentType = $request->getHeaderLine('content-type');
-        if (($pos = strpos($rawContentType, ';')) !== false) {
-            $contentType = strtolower(substr($rawContentType, 0, $pos));
-        } else {
-            $contentType = strtolower($rawContentType);
-        }
-        switch ($contentType) {
-            case 'application/json':
-            case 'text/json':
-                $data = json_decode((string) $request->getBody(), true);
-                break;
-            case 'application/xml':
-            case 'text/xml':
-                $data = (array) simplexml_load_string((string) $request->getBody());
-                break;
-        }
-
-        return $data;
+        return 'https' === $uri->getScheme() ? 443 : ('http' === $uri->getScheme() ? 80 : null);
     }
 }
