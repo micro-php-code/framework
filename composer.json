@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": ">=8.0",
-        "nyholm/psr7": "^1.8",
+        "guzzlehttp/psr7": "^2.6",
         "league/container": "^4.0",
         "league/route": "^5.0",
         "illuminate/database": "^9.0",
@@ -30,6 +30,7 @@
         "respect/validation": "^2.2",
         "symfony/finder": "^6",
         "guzzlehttp/guzzle": "^7.7",
-        "symfony/dotenv": "^6.0"
+        "symfony/dotenv": "^6.0",
+        "ext-simplexml": "*"
     }
 }

@@ -8,6 +8,7 @@ use MicroPHP\Framework\Config\Config;
 use MicroPHP\Framework\Http\Contract\HttpServerInterface;
 use MicroPHP\Framework\Http\Enum\Driver;
 use MicroPHP\RoadRunner\RoadRunnerHttpServer;
+use MicroPHP\Swoole\SwooleHttpServer;
 use MicroPHP\Workerman\WorkermanHttpServer;
 use RuntimeException;
 
@@ -19,6 +20,7 @@ class ServerFactory
         return match ($serverConfig->getDriver()) {
             Driver::WORKERMAN => new WorkermanHttpServer(),
             Driver::ROADRUNNER => new RoadRunnerHttpServer(),
+            Driver::SWOOLE => new SwooleHttpServer(),
             default => throw new RuntimeException('unsupported driver: ' . $serverConfig->getDriver()),
         };
     }

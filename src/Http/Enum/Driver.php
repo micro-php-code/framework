@@ -9,4 +9,6 @@ class Driver
     public const WORKERMAN = 'workerman';
 
     public const ROADRUNNER = 'roadrunner';
+
+    public const SWOOLE = 'swoole';
 }

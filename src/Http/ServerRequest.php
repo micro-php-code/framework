@@ -4,152 +4,137 @@ declare(strict_types=1);
 
 namespace MicroPHP\Framework\Http;
 
+use GuzzleHttp\Psr7\HttpFactory;
+use GuzzleHttp\Psr7\Uri;
+use InvalidArgumentException;
 use MicroPHP\Framework\Http\Traits\InputTrait;
-use MicroPHP\Framework\Http\Traits\MessageTrait;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use Swoole\Http\Request;
 
-class ServerRequest implements ServerRequestInterface
+class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequestInterface
 {
-    use MessageTrait;
     use InputTrait;
 
     private ServerRequestInterface $bind;
 
-    public function __construct(string $method, $uri, array $headers = [], $body = null, string $version = '1.1', array $serverParams = [])
+    public static function fromPsr7(ServerRequestInterface $request): ServerRequestInterface|ServerRequest
     {
-        $this->bind = new \Nyholm\Psr7\ServerRequest($method, $uri, $headers, $body, $version, $serverParams);
+        return (new static($request->getMethod(), $request->getUri(), $request->getHeaders(), $request->getBody(), $request->getProtocolVersion(), $request->getServerParams()))
+            ->withParsedBody(self::normalizeParsedBody($request->getParsedBody(), $request))
+            ->withUploadedFiles($request->getUploadedFiles())
+            ->withCookieParams($request->getCookieParams())
+            ->withQueryParams($request->getQueryParams());
     }
 
-    public static function fromPsr7(ServerRequestInterface $request): static
+    public static function fromSwoole(Request $swooleRequest): ServerRequestInterface|ServerRequest
     {
-        return new static($request->getMethod(), $request->getUri(), $request->getHeaders(), $request->getBody(), $request->getProtocolVersion(), $request->getServerParams());
+        $server = $swooleRequest->server;
+        $method = $server['request_method'] ?? 'GET';
+        $headers = $swooleRequest->header ?? [];
+        $uri = self::getUriFromSwooleRequest($swooleRequest);
+        $httpFactory = new HttpFactory();
+        $body = $httpFactory->createStream((string) $swooleRequest->rawContent());
+        $protocol = isset($server['server_protocol']) ? str_replace('HTTP/', '', $server['server_protocol']) : '1.1';
+        $request = new ServerRequest($method, $uri, $headers, $body, $protocol, $server);
+        return $request->withCookieParams($swooleRequest->cookie ?? [])
+            ->withQueryParams($swooleRequest->get ?? [])
+            ->withParsedBody(self::normalizeParsedBody($swooleRequest->post ?? [], $request))
+            ->withUploadedFiles(self::normalizeFiles($swooleRequest->files ?? []));
     }
 
-    public function getServerParams(): array
+    private static function getUriFromSwooleRequest(Request $swooleRequest): UriInterface
     {
-        return $this->bind->getServerParams();
+        $server = $swooleRequest->server;
+        $header = $swooleRequest->header;
+        $uri = new Uri();
+        $uri = $uri->withScheme(! empty($server['https']) && $server['https'] !== 'off' ? 'https' : 'http');
+
+        $hasPort = false;
+        if (isset($server['http_host'])) {
+            [$host, $port] = self::parseHost($server['http_host']);
+            $uri = $uri->withHost($host);
+            if (isset($port)) {
+                $hasPort = true;
+                $uri = $uri->withPort($port);
+            }
+        } elseif (isset($server['server_name'])) {
+            $uri = $uri->withHost($server['server_name']);
+        } elseif (isset($server['server_addr'])) {
+            $uri = $uri->withHost($server['server_addr']);
+        } elseif (isset($header['host'])) {
+            $hasPort = true;
+            [$host, $port] = self::parseHost($header['host']);
+            if (isset($port) && $port !== self::getUriDefaultPort($uri)) {
+                $uri = $uri->withPort($port);
+            }
+
+            $uri = $uri->withHost($host);
+        }
+
+        if (! $hasPort && isset($server['server_port'])) {
+            $uri = $uri->withPort($server['server_port']);
+        }
+
+        $hasQuery = false;
+        if (isset($server['request_uri'])) {
+            $requestUriParts = explode('?', $server['request_uri']);
+            $uri = $uri->withPath($requestUriParts[0]);
+            if (isset($requestUriParts[1])) {
+                $hasQuery = true;
+                $uri = $uri->withQuery($requestUriParts[1]);
+            }
+        }
+
+        if (! $hasQuery && isset($server['query_string'])) {
+            $uri = $uri->withQuery($server['query_string']);
+        }
+
+        return $uri;
     }
 
-    public function getCookieParams(): array
+    /**
+     * Get host parts, support ipv6.
+     */
+    private static function parseHost(string $httpHost): array
     {
-        return $this->bind->getCookieParams();
+        $parts = parse_url('//' . $httpHost);
+        if (! isset($parts['host'])) {
+            throw new InvalidArgumentException('Invalid host: ' . $httpHost);
+        }
+
+        return [$parts['host'], $parts['port'] ?? null];
     }
 
-    public function withCookieParams(array $cookies): static
+    private static function getUriDefaultPort(UriInterface $uri): ?int
     {
-        $new = clone $this;
-        $new->bind = $this->bind->withCookieParams($cookies);
-
-        return $new;
+        return $uri->getScheme() === 'https' ? 443 : ($uri->getScheme() === 'http' ? 80 : null);
     }
 
-    public function getQueryParams(): array
+    protected static function normalizeParsedBody(array $data = [], ?RequestInterface $request = null): array
     {
-        return $this->bind->getQueryParams();
-    }
+        if (! $request) {
+            return $data;
+        }
 
-    public function withQueryParams(array $query): static
-    {
-        $new = clone $this;
-        $new->bind = $this->bind->withQueryParams($query);
+        $rawContentType = $request->getHeaderLine('content-type');
+        if (($pos = strpos($rawContentType, ';')) !== false) {
+            $contentType = strtolower(substr($rawContentType, 0, $pos));
+        } else {
+            $contentType = strtolower($rawContentType);
+        }
+        switch ($contentType) {
+            case 'application/json':
+            case 'text/json':
+                $data = json_decode((string) $request->getBody(), true);
+                break;
+            case 'application/xml':
+            case 'text/xml':
+                $data = (array) simplexml_load_string((string) $request->getBody());
+                break;
+        }
 
-        return $new;
-    }
-
-    public function getUploadedFiles(): array
-    {
-        return $this->bind->getUploadedFiles();
-    }
-
-    public function withUploadedFiles(array $uploadedFiles): static
-    {
-        $new = clone $this;
-        $new->bind = $this->bind->withUploadedFiles($uploadedFiles);
-
-        return $new;
-    }
-
-    public function getParsedBody(): object|array|null
-    {
-        return $this->bind->getParsedBody();
-    }
-
-    public function withParsedBody($data): static
-    {
-        $new = clone $this;
-        $new->bind = $this->bind->withParsedBody($data);
-
-        return $new;
-    }
-
-    public function getAttributes(): array
-    {
-        return $this->bind->getAttributes();
-    }
-
-    public function getAttribute(string $name, $default = null)
-    {
-        return $this->bind->getAttribute($name, $default);
-    }
-
-    public function withAttribute(string $name, $value): static
-    {
-        $new = clone $this;
-        $new->bind = $this->bind->withAttribute($name, $value);
-
-        return $new;
-    }
-
-    public function withoutAttribute(string $name): static
-    {
-        $new = clone $this;
-        $new->bind = $this->bind->withoutAttribute($name);
-
-        return $new;
-    }
-
-    public function getRequestTarget(): string
-    {
-        return $this->bind->getRequestTarget();
-    }
-
-    public function withRequestTarget(string $requestTarget): static
-    {
-        $new = clone $this;
-        $new->bind = $this->bind->withRequestTarget($requestTarget);
-
-        return $new;
-    }
-
-    public function getMethod(): string
-    {
-        return $this->bind->getMethod();
-    }
-
-    public function withMethod(string $method): static
-    {
-        $new = clone $this;
-        $new->bind = $this->bind->withMethod($method);
-
-        return $new;
-    }
-
-    public function getUri(): UriInterface
-    {
-        return $this->bind->getUri();
-    }
-
-    public function withUri(UriInterface $uri, bool $preserveHost = false): static
-    {
-        $new = clone $this;
-        $new->bind = $this->bind->withUri($uri, $preserveHost);
-
-        return $new;
-    }
-
-    public function getProtocolVersion(): string
-    {
-        return $this->bind->getProtocolVersion();
+        return $data;
     }
 }
