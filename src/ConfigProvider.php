@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MicroPHP\Framework;
 
+use MicroPHP\Framework\Commands\PublishConfigCommand;
 use MicroPHP\Framework\Commands\StartCommand;
 use MicroPHP\Framework\Config\ConfigProviderInterface;
 
@@ -14,6 +15,7 @@ class ConfigProvider implements ConfigProviderInterface
         return [
             'commands' => [
                 StartCommand::class,
+                PublishConfigCommand::class,
             ],
         ];
     }
