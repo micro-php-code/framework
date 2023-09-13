@@ -11,4 +11,6 @@ class Driver
     public const ROADRUNNER = 'roadrunner';
 
     public const SWOOLE = 'swoole';
+
+    public const AMP = 'amp';
 }

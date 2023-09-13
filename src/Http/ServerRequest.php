@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MicroPHP\Framework\Http;
 
+use Amp\ByteStream\BufferException;
+use Amp\ByteStream\StreamException;
+use Amp\Http\Server\ClientException;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Uri;
 use InvalidArgumentException;
@@ -43,6 +46,26 @@ class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequ
             ->withQueryParams($swooleRequest->get ?? [])
             ->withParsedBody(self::normalizeParsedBody($swooleRequest->post ?? [], $request))
             ->withUploadedFiles(self::normalizeFiles($swooleRequest->files ?? []));
+    }
+
+    /**
+     * @throws ClientException
+     * @throws BufferException
+     * @throws StreamException
+     */
+    public static function fromAmp(\Amp\Http\Server\Request $ampRequest): ServerRequestInterface|ServerRequest
+    {
+        $request = new ServerRequest(
+            $ampRequest->getMethod(),
+            $ampRequest->getUri(),
+            $ampRequest->getHeaders(),
+            $ampRequest->getBody()->buffer(),
+            $ampRequest->getProtocolVersion(),
+        );
+
+        return $request->withParsedBody(self::normalizeParsedBody([], $request))
+            ->withCookieParams($ampRequest->getCookies())
+            ->withQueryParams($ampRequest->getQueryParameters());
     }
 
     protected static function normalizeParsedBody(array $data = [], RequestInterface $request = null): array

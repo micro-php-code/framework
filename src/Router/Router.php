@@ -10,7 +10,7 @@ class Router extends \League\Route\Router
 {
     public function getOrPost(string $path, $handler): RouteGroup
     {
-        return $this->group('', function(RouteGroup $group) use ($path, $handler) {
+        return $this->group('', function (RouteGroup $group) use ($path, $handler) {
             $group->get($path, $handler);
             $group->post($path, $handler);
         });

@@ -33,6 +33,7 @@ class StartCommand extends Command
             Driver::WORKERMAN => $this->workermanStart(),
             Driver::ROADRUNNER => $this->roadrunnerStart($output, $serverConfig),
             Driver::SWOOLE => $this->swooleStart(),
+            Driver::AMP => $this->ampStart(),
             default => throw new RuntimeException('unsupported driver: ' . $serverConfig->getDriver()),
         };
     }
@@ -86,6 +87,18 @@ class StartCommand extends Command
      * @throws NotFoundExceptionInterface
      */
     private function swooleStart(): int
+    {
+        Application::getClass(Application::class)->run();
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     * @throws NotFoundExceptionInterface
+     */
+    private function ampStart(): int
     {
         Application::getClass(Application::class)->run();
 
