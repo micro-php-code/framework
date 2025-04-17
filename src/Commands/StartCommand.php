@@ -70,9 +70,11 @@ class StartCommand extends Command
     }
 
     /**
+     * @param OutputInterface $output
+     * @return int
      * @throws ContainerExceptionInterface
-     * @throws ReflectionException
      * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
      */
     private function workermanStart(OutputInterface $output): int
     {
@@ -82,9 +84,11 @@ class StartCommand extends Command
     }
 
     /**
+     * @param OutputInterface $output
+     * @return int
      * @throws ContainerExceptionInterface
-     * @throws ReflectionException
      * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
      */
     private function swooleStart(OutputInterface $output): int
     {

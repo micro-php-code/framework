@@ -40,13 +40,17 @@ final class Application
     }
 
     /**
+     * @param OutputInterface $output
+     * @return Application
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
     public function run(OutputInterface $output): Application
     {
         $app = new Application();
-        $config = $app->init();
-        $app->listen($config, $output);
+        $app->init();
+        $app->listen($output);
 
         return $app;
     }
@@ -73,21 +77,24 @@ final class Application
     /**
      * @throws ReflectionException
      */
-    private function init(): array
+    private function init(): void
     {
         Env::load();
         $this->initContainer();
         $config = $this->getConfig();
         $this->initDatabase($config['database']);
         $this->scanAttributes($config['app']['scanner']);
-
-        return $config;
-    }
-
-    private function listen(array $config, OutputInterface $output): void
-    {
         $router = $this->getRouter($config['routes']);
         Application::getContainer()->add(Router::class, $router);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private function listen(OutputInterface $output): void
+    {
+        $router = Application::getContainer()->get(Router::class);
         ServerFactory::newServer()->run($router, $output);
     }
 

@@ -6,6 +6,7 @@ namespace MicroPHP\Framework;
 
 use MicroPHP\Framework\Commands\PublishConfigCommand;
 use MicroPHP\Framework\Commands\StartCommand;
+use MicroPHP\Framework\Commands\SwaggerGenerateCommand;
 use MicroPHP\Framework\Config\ConfigProviderInterface;
 
 class ConfigProvider implements ConfigProviderInterface
@@ -16,6 +17,7 @@ class ConfigProvider implements ConfigProviderInterface
             'commands' => [
                 StartCommand::class,
                 PublishConfigCommand::class,
+                SwaggerGenerateCommand::class,
             ],
         ];
     }
