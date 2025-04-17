@@ -16,6 +16,7 @@ use MicroPHP\Framework\Router\Router;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
+use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
 final class Application
@@ -41,11 +42,11 @@ final class Application
     /**
      * @throws ReflectionException
      */
-    public function run(): Application
+    public function run(OutputInterface $output): Application
     {
         $app = new Application();
         $config = $app->init();
-        $app->listen($config);
+        $app->listen($config, $output);
 
         return $app;
     }
@@ -83,11 +84,11 @@ final class Application
         return $config;
     }
 
-    private function listen(array $config): void
+    private function listen(array $config, OutputInterface $output): void
     {
         $router = $this->getRouter($config['routes']);
         Application::getContainer()->add(Router::class, $router);
-        ServerFactory::newServer()->run($router);
+        ServerFactory::newServer()->run($router, $output);
     }
 
     private function initDatabase(array $config): void
