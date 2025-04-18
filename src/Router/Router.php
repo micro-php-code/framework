@@ -27,7 +27,7 @@ class Router extends \League\Route\Router
 
     public function map(string $method, string $path, $handler): Route
     {
-        $path  = sprintf('/%s', ltrim($path, '/'));
+        $path = sprintf('/%s', ltrim($path, '/'));
         $route = new Route($method, $path, $handler);
 
         $this->routes[] = $route;
@@ -37,7 +37,7 @@ class Router extends \League\Route\Router
 
     protected function buildOptionsRoutes(array $options): void
     {
-        if (!($this->getStrategy() instanceof OptionsHandlerInterface)) {
+        if (! $this->getStrategy() instanceof OptionsHandlerInterface) {
             return;
         }
 
@@ -48,16 +48,16 @@ class Router extends \League\Route\Router
             [$scheme, $host, $port, $path] = explode(static::IDENTIFIER_SEPARATOR, $identifier);
             $route = new Route('OPTIONS', $path, $strategy->getOptionsCallable($methods));
 
-            if (!empty($scheme)) {
+            if (! empty($scheme)) {
                 $route->setScheme($scheme);
             }
 
-            if (!empty($host)) {
+            if (! empty($host)) {
                 $route->setHost($host);
             }
 
-            if (!empty($port)) {
-                $route->setPort((int)$port);
+            if (! empty($port)) {
+                $route->setPort((int) $port);
             }
 
             $this->routeCollector->addRoute($route->getMethod(), $this->parseRoutePath($route->getPath()), $route);

@@ -70,8 +70,6 @@ class StartCommand extends Command
     }
 
     /**
-     * @param OutputInterface $output
-     * @return int
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
@@ -84,8 +82,6 @@ class StartCommand extends Command
     }
 
     /**
-     * @param OutputInterface $output
-     * @return int
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException

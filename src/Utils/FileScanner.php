@@ -21,15 +21,14 @@ trait FileScanner
 
         $tokens = token_get_all($content);
 
-        for ($i = 0; $i < count($tokens); $i++) {
-
+        for ($i = 0; $i < count($tokens); ++$i) {
             // 读取命名空间
-            if (T_NAMESPACE === $tokens[$i][0]) {
+            if ($tokens[$i][0] === T_NAMESPACE) {
                 $namespace = $this->getNamespace($tokens, $i);
             }
 
             // 读取类名
-            if (T_CLASS === $tokens[$i][0]) {
+            if ($tokens[$i][0] === T_CLASS) {
                 return $this->getReflectionClass($tokens[$i + 2][1], $namespace);
             }
         }
@@ -43,8 +42,8 @@ trait FileScanner
     private function getNamespace(array $tokens, int $namespaceIndex): string
     {
         $namespace = '';
-        for ($i = $namespaceIndex + 1; $i < count($tokens); $i++) {
-            if (';' === $tokens[$i]) {
+        for ($i = $namespaceIndex + 1; $i < count($tokens); ++$i) {
+            if ($tokens[$i] === ';') {
                 break;
             }
             $namespace .= $tokens[$i][1];

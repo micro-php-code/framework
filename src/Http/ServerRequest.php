@@ -22,7 +22,7 @@ class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequ
 
     private ServerRequestInterface $bind;
 
-    public static function fromPsr7(ServerRequestInterface $request): ServerRequestInterface|ServerRequest
+    public static function fromPsr7(ServerRequestInterface $request): ServerRequest|ServerRequestInterface
     {
         return (new static($request->getMethod(), $request->getUri(), $request->getHeaders(), $request->getBody(), $request->getProtocolVersion(), $request->getServerParams()))
             ->withParsedBody(self::normalizeParsedBody($request->getParsedBody(), $request))
@@ -31,7 +31,7 @@ class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequ
             ->withQueryParams($request->getQueryParams());
     }
 
-    public static function fromSwoole(Request $swooleRequest): ServerRequestInterface|ServerRequest
+    public static function fromSwoole(Request $swooleRequest): ServerRequest|ServerRequestInterface
     {
         $server = $swooleRequest->server;
         $method = $server['request_method'] ?? 'GET';
@@ -53,7 +53,7 @@ class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequ
      * @throws BufferException
      * @throws StreamException
      */
-    public static function fromAmp(\Amp\Http\Server\Request $ampRequest): ServerRequestInterface|ServerRequest
+    public static function fromAmp(\Amp\Http\Server\Request $ampRequest): ServerRequest|ServerRequestInterface
     {
         $request = new ServerRequest(
             $ampRequest->getMethod(),
@@ -68,7 +68,7 @@ class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequ
             ->withQueryParams($ampRequest->getQueryParameters());
     }
 
-    protected static function normalizeParsedBody(array $data = [], RequestInterface $request = null): array
+    protected static function normalizeParsedBody(array $data = [], ?RequestInterface $request = null): ?array
     {
         if (! $request) {
             return $data;
@@ -99,7 +99,7 @@ class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequ
         $server = $swooleRequest->server;
         $header = $swooleRequest->header;
         $uri = new Uri();
-        $uri = $uri->withScheme(! empty($server['https']) && 'off' !== $server['https'] ? 'https' : 'http');
+        $uri = $uri->withScheme(! empty($server['https']) && $server['https'] !== 'off' ? 'https' : 'http');
 
         $hasPort = false;
         if (isset($server['http_host'])) {
@@ -159,6 +159,6 @@ class ServerRequest extends \GuzzleHttp\Psr7\ServerRequest implements ServerRequ
 
     private static function getUriDefaultPort(UriInterface $uri): ?int
     {
-        return 'https' === $uri->getScheme() ? 443 : ('http' === $uri->getScheme() ? 80 : null);
+        return $uri->getScheme() === 'https' ? 443 : ($uri->getScheme() === 'http' ? 80 : null);
     }
 }

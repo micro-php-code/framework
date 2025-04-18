@@ -6,6 +6,4 @@ namespace MicroPHP\Framework\Container;
 
 use League\Container\DefinitionContainerInterface;
 
-interface ContainerInterface extends DefinitionContainerInterface
-{
-}
+interface ContainerInterface extends DefinitionContainerInterface {}

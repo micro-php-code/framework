@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MicroPHP\Framework\Swagger;
@@ -16,7 +17,8 @@ class PathGetter implements PathGetterInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function getPath(string $controller, string $function, MethodEnum $requestMethod = null):?string {
+    public static function getPath(string $controller, string $function, ?MethodEnum $requestMethod = null): ?string
+    {
         /** @var Router $route */
         $route = Application::getContainer()->get(Router::class);
         foreach ($route->getRoutes() as $route) {
@@ -27,6 +29,7 @@ class PathGetter implements PathGetterInterface
                 }
             }
         }
+
         return null;
     }
 }

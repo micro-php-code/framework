@@ -26,11 +26,9 @@ class Config
     }
 
     /**
-     * @param mixed $directory
-     *
      * @throws ReflectionException
      */
-    public static function load($directory): array
+    public static function load(string $directory): array
     {
         static::$config = (new ConfigProviderScanner())->scan();
 

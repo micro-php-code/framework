@@ -11,15 +11,15 @@ namespace MicroPHP\Framework\Model\Traits;
  */
 trait ModelIdeHelper
 {
-    public static function findByField(string $key, string|int $value): ?static
+    public static function findByField(string $key, int|string $value): ?static
     {
-        /** @var static $data */
+        /* @var static $data */
         return self::query()->where($key, $value)->first();
     }
 
     public static function findByWhere(array $where): ?static
     {
-        /** @var static $data */
+        /* @var static $data */
         return self::query()->where($where)->first();
     }
 

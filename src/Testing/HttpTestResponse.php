@@ -39,7 +39,7 @@ class HttpTestResponse
         $json = $this->decodeResponseJson();
         $result = data_get($json, $key, $default);
         if (str_contains($key, '*')) {
-            if (0 === count(array_filter($result, fn ($item) => ! is_null($item)))) {
+            if (count(array_filter($result, fn ($item) => ! is_null($item))) === 0) {
                 Assert::fail('array key:' . $key . ' not found');
             }
         } else {
@@ -49,7 +49,7 @@ class HttpTestResponse
         return $this;
     }
 
-    public function json(string $key = null)
+    public function json(?string $key = null)
     {
         return is_null($key) ? $this->decodeResponseJson() : $this->decodeResponseJson()[$key];
     }

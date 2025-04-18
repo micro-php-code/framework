@@ -6,15 +6,9 @@ namespace MicroPHP\Framework;
 
 use JsonSerializable;
 use MicroPHP\Framework\Http\Response;
-use Respect\Validation\Validator;
 
 class Controller
 {
-    public function validate(array $rules, array $data): void
-    {
-        Validator::allOf(...$rules)->assert($data);
-    }
-
     protected function json(mixed $data): Response
     {
         if ($data instanceof JsonSerializable) {

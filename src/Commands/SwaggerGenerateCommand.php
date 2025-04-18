@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MicroPHP\Framework\Commands;
@@ -16,6 +17,7 @@ class SwaggerGenerateCommand extends Command
     {
         Swagger::gen();
         $output->writeln('<info>swagger was generated</info>');
+
         return Command::SUCCESS;
     }
 

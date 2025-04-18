@@ -23,9 +23,7 @@ final class Application
 {
     private static ContainerInterface $container;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * @throws Throwable
@@ -40,8 +38,6 @@ final class Application
     }
 
     /**
-     * @param OutputInterface $output
-     * @return Application
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
@@ -85,6 +81,7 @@ final class Application
         $this->initDatabase($config['database']);
         $this->scanAttributes($config['app']['scanner']);
         $router = $this->getRouter($config['routes']);
+        $router->middlewares($config['middlewares']);
         Application::getContainer()->add(Router::class, $router);
     }
 

@@ -11,7 +11,7 @@ class Env
     public static function get(string $key, mixed $default = null)
     {
         $value = getenv($key);
-        if (false === $value) {
+        if ($value === false) {
             return $default;
         }
         switch (strtolower($value)) {
@@ -28,7 +28,7 @@ class Env
             case '(null)':
                 return null;
         }
-        if (($valueLength = strlen($value)) > 1 && '"' === $value[0] && '"' === $value[$valueLength - 1]) {
+        if (($valueLength = strlen($value)) > 1 && $value[0] === '"' && $value[$valueLength - 1] === '"') {
             return substr($value, 1, -1);
         }
 
